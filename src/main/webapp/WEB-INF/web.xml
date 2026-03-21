@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+         https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <!--
+        Yeh file Tomcat ko batati hai ki yeh ek WAR web application hai.
+        Spring Boot ka SpringBootServletInitializer actual startup handle karta hai.
+        Isliye yeh file minimal rakhi hai.
+    -->
+    <display-name>Calculator App</display-name>
+
+</web-app>
