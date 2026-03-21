@@ -42,7 +42,6 @@ public class CalculatorService {
      */
     public CalculatorResult divide(double num1, double num2) {
         if (num2 == 0) {
-            // Zero se divide karna mathematically impossible hai
             return new CalculatorResult("Error: Division by zero is not allowed!");
         }
         double result = num1 / num2;
@@ -72,7 +71,6 @@ public class CalculatorService {
 
     /**
      * Square Root: √num1
-     * num2 is ignored for this operation
      */
     public CalculatorResult sqrt(double num1) {
         if (num1 < 0) {
@@ -80,5 +78,23 @@ public class CalculatorService {
         }
         double result = Math.sqrt(num1);
         return new CalculatorResult(num1, 0, "sqrt", result);
+    }
+
+    /**
+     * Cube Root: ∛num1
+     * Example: ∛27 = 3.0
+     */
+    public CalculatorResult cubeRoot(double num1) {
+        double result = Math.cbrt(num1);
+        return new CalculatorResult(num1, 0, "cuberoot", result);
+    }
+
+    /**
+     * Absolute Value: |num1|
+     * Example: |-5| = 5.0
+     */
+    public CalculatorResult absolute(double num1) {
+        double result = Math.abs(num1);
+        return new CalculatorResult(num1, 0, "absolute", result);
     }
 }
