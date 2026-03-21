@@ -1,8 +1,8 @@
 package com.devops.calculator;
-
+ 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+ 
 /**
  * Calculator Controller - Saare REST endpoints yahan hain
  *
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
  *   GET /api/calculator/modulo?num1=10&num2=3    → 1.0
  *   GET /api/calculator/power?num1=2&num2=8      → 256.0
  *   GET /api/calculator/sqrt?num1=16             → 4.0
+ *   GET /api/calculator/cuberoot?num1=27         → 3.0
  *
  * @RequestParam ke baare mein:
  *   URL mein "?" ke baad jo values aate hain unhe query parameters kehte hain.
@@ -25,11 +26,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/calculator")
 @CrossOrigin(origins = "*")  // Frontend se access allow karne ke liye
 public class CalculatorController {
-
+ 
     // Service inject karo (Spring automatically dega)
     @Autowired
     private CalculatorService calculatorService;
-
+ 
     /**
      * GET /api/calculator/add?num1=10&num2=5
      * Try karo: curl "http://localhost:8080/api/calculator/add?num1=10&num2=5"
@@ -40,7 +41,7 @@ public class CalculatorController {
             @RequestParam("num2") double num2) {
         return calculatorService.add(num1, num2);
     }
-
+ 
     /**
      * GET /api/calculator/subtract?num1=10&num2=3
      */
@@ -50,7 +51,7 @@ public class CalculatorController {
             @RequestParam("num2") double num2) {
         return calculatorService.subtract(num1, num2);
     }
-
+ 
     /**
      * GET /api/calculator/multiply?num1=4&num2=5
      */
@@ -60,7 +61,7 @@ public class CalculatorController {
             @RequestParam("num2") double num2) {
         return calculatorService.multiply(num1, num2);
     }
-
+ 
     /**
      * GET /api/calculator/divide?num1=20&num2=4
      * Agar num2=0 ho toh error return hoga
@@ -71,7 +72,7 @@ public class CalculatorController {
             @RequestParam("num2") double num2) {
         return calculatorService.divide(num1, num2);
     }
-
+ 
     /**
      * GET /api/calculator/modulo?num1=10&num2=3
      * Returns remainder: 10 % 3 = 1
@@ -82,7 +83,7 @@ public class CalculatorController {
             @RequestParam("num2") double num2) {
         return calculatorService.modulo(num1, num2);
     }
-
+ 
     /**
      * GET /api/calculator/power?num1=2&num2=8
      * Returns: 2^8 = 256
@@ -93,7 +94,7 @@ public class CalculatorController {
             @RequestParam("num2") double num2) {
         return calculatorService.power(num1, num2);
     }
-
+ 
     /**
      * GET /api/calculator/sqrt?num1=16
      * Returns: √16 = 4.0
@@ -103,7 +104,17 @@ public class CalculatorController {
             @RequestParam("num1") double num1) {
         return calculatorService.sqrt(num1);
     }
-
+ 
+    /**
+     * GET /api/calculator/cuberoot?num1=27
+     * Returns: ∛27 = 3.0
+     */
+    @GetMapping("/cuberoot")
+    public CalculatorResult cubeRoot(
+            @RequestParam("num1") double num1) {
+        return calculatorService.cubeRoot(num1);
+    }
+ 
     /**
      * GET /api/calculator/health
      * Quick check: app chal rahi hai ya nahi
