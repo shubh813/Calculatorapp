@@ -1,0 +1,41 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Print Git Commit SHA
+      run: |
+        echo "================================================"
+        echo "Git Commit SHA: ${{ github.sha }}"
+        echo "Branch: ${{ github.ref_name }}"
+        echo "Triggered by: ${{ github.actor }}"
+        echo "================================================"
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn -B package -DskipTests --file pom.xml
+
+    - name: Show WAR file info
+      run: |
+        echo "WAR file created:"
+        ls -lh target/*.war
+        echo "SHA-256 of WAR:"
+        sha256sum target/*.war
+        echo "MANIFEST.MF contents:"
+        unzip -p target/*.war META-INF/MANIFEST.MF
