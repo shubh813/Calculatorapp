@@ -30,30 +30,31 @@ pipeline {
                 echo '✅ WAR file built successfully!'
             }
         }
-stage('Deploy to Tomcat') {
-    steps {
-        echo '🚀 Deploying WAR to Tomcat Docker container...'
-        sh '''
-            # Step 1: Stop Tomcat first
-            docker exec ${TOMCAT_CONTAINER} /usr/local/tomcat/bin/shutdown.sh || true
-            sleep 8
+        stage('Deploy to Tomcat') {
+            steps {
+                echo '🚀 Deploying WAR to Tomcat Docker container...'
+                sh '''
+                    # Stop and remove old Tomcat container completely
+                    docker stop ${TOMCAT_CONTAINER} || true
+                    docker rm ${TOMCAT_CONTAINER} || true
 
-            # Step 2: Now delete old WAR (Tomcat is stopped, file is free)
-            docker exec ${TOMCAT_CONTAINER} rm -rf ${DEPLOY_PATH}calculator-app.war || true
-            docker exec ${TOMCAT_CONTAINER} rm -rf ${DEPLOY_PATH}calculator-app || true
+                    # Start fresh Tomcat container
+                    docker run -d \
+                        --name ${TOMCAT_CONTAINER} \
+                        -p 8090:8080 \
+                        tomcat:latest
 
-            # Step 3: Copy new WAR
-            docker cp ${WAR_FILE} ${TOMCAT_CONTAINER}:${DEPLOY_PATH}
-            echo "✅ WAR copied!"
+                    # Wait for Tomcat to start
+                    sleep 10
 
-            # Step 4: Start Tomcat again
-            docker exec -d ${TOMCAT_CONTAINER} /usr/local/tomcat/bin/startup.sh
-            echo "✅ Tomcat started!"
-        '''
-        sh 'sleep 20'
-        echo '✅ Deployment complete!'
-    }
-}
+                    # Copy WAR into fresh container
+                    docker cp ${WAR_FILE} ${TOMCAT_CONTAINER}:${DEPLOY_PATH}
+                    echo "✅ WAR deployed to fresh Tomcat!"
+                '''
+                sh 'sleep 20'
+                echo '✅ Deployment complete!'
+            }
+        }
         stage('Verify Deployment') {
             steps {
                 echo '🔍 Verifying deployment...'
@@ -63,35 +64,4 @@ stage('Deploy to Tomcat') {
                     echo $RESPONSE
                     DEPLOYED_COMMIT=$(echo $RESPONSE | grep -o '"gitCommitShort":"[^"]*"' | cut -d'"' -f4)
                     echo ""
-                    echo "✅ Successfully deployed commit: $DEPLOYED_COMMIT"
-                '''
-            }
-        }
-        stage('Health Check') {
-            steps {
-                sh '''
-                    HEALTH=$(curl -s ${APP_URL}/api/calculator/health)
-                    echo "💚 Health Status: $HEALTH"
-                '''
-            }
-        }
-    }
-    post {
-        success {
-            echo '''
-            ╔══════════════════════════════════╗
-            ║   ✅ DEPLOYMENT SUCCESSFUL!      ║
-            ║   Calculator App is LIVE!        ║
-            ╚══════════════════════════════════╝
-            '''
-        }
-        failure {
-            echo '''
-            ╔══════════════════════════════════╗
-            ║   ❌ DEPLOYMENT FAILED!          ║
-            ║   Check logs above for errors    ║
-            ╚══════════════════════════════════╝
-            '''
-        }
-    }
-}
+                    echo "✅ Successfully deploye
