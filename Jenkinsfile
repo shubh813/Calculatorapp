@@ -7,7 +7,7 @@ pipeline {
         TOMCAT_CONTAINER = 'tomcat-demo'
         WAR_FILE = 'target/calculator-app.war'
         DEPLOY_PATH = '/usr/local/tomcat/webapps/'
-        APP_URL = 'http://localhost:8090/calculator-app'
+        APP_URL = 'http://192.168.1.54:8090/calculator-app'
     }
     stages {
         stage('Checkout') {
@@ -45,12 +45,12 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 echo 'Verifying deployment...'
-                sh 'curl -s http://localhost:8090/calculator-app/info'
+                sh 'curl -s http://192.168.1.54:8090/calculator-app/info'
             }
         }
         stage('Health Check') {
             steps {
-                sh 'curl -s http://localhost:8090/calculator-app/api/calculator/health'
+                sh 'curl -s http://192.168.1.54:8090/calculator-app/api/calculator/health'
             }
         }
     }
