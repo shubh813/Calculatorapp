@@ -30,28 +30,30 @@ pipeline {
                 echo '✅ WAR file built successfully!'
             }
         }
-        stage('Deploy to Tomcat') {
-            steps {
-                echo '🚀 Deploying WAR to Tomcat Docker container...'
-                sh '''
-                    # Remove old WAR and extracted folder first
-                    docker exec ${TOMCAT_CONTAINER} rm -rf ${DEPLOY_PATH}calculator-app.war
-                    docker exec ${TOMCAT_CONTAINER} rm -rf ${DEPLOY_PATH}calculator-app
+stage('Deploy to Tomcat') {
+    steps {
+        echo '🚀 Deploying WAR to Tomcat Docker container...'
+        sh '''
+            # Step 1: Stop Tomcat first
+            docker exec ${TOMCAT_CONTAINER} /usr/local/tomcat/bin/shutdown.sh || true
+            sleep 8
 
-                    # Copy new WAR into container
-                    docker cp ${WAR_FILE} ${TOMCAT_CONTAINER}:${DEPLOY_PATH}
+            # Step 2: Now delete old WAR (Tomcat is stopped, file is free)
+            docker exec ${TOMCAT_CONTAINER} rm -rf ${DEPLOY_PATH}calculator-app.war || true
+            docker exec ${TOMCAT_CONTAINER} rm -rf ${DEPLOY_PATH}calculator-app || true
 
-                    # Restart Tomcat to pick up new WAR
-                    docker exec ${TOMCAT_CONTAINER} /usr/local/tomcat/bin/shutdown.sh || true
-                    sleep 5
-                    docker exec ${TOMCAT_CONTAINER} /usr/local/tomcat/bin/startup.sh
+            # Step 3: Copy new WAR
+            docker cp ${WAR_FILE} ${TOMCAT_CONTAINER}:${DEPLOY_PATH}
+            echo "✅ WAR copied!"
 
-                    echo "✅ WAR copied and Tomcat restarted!"
-                '''
-                sh 'sleep 15'
-                echo '✅ Deployment complete!'
-            }
-        }
+            # Step 4: Start Tomcat again
+            docker exec -d ${TOMCAT_CONTAINER} /usr/local/tomcat/bin/startup.sh
+            echo "✅ Tomcat started!"
+        '''
+        sh 'sleep 20'
+        echo '✅ Deployment complete!'
+    }
+}
         stage('Verify Deployment') {
             steps {
                 echo '🔍 Verifying deployment...'
