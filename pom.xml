@@ -49,6 +49,12 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <finalName>calculator-app</finalName>  <!-- WAR ka naam: calculator-app.war -->
         <plugins>
 
@@ -118,5 +124,10 @@
 
         </plugins>
     </build>
-
+<resources>
+    <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+    </resource>
+</resources>
 </project>
